@@ -1,25 +1,20 @@
 module safety_2d() {
-     union() {
-          arc(sf_or, sf_ta, sf_ba, IR=sf_sr);
-          arc(sf_or, sf_da, sf_ba, IR=sf_dr);
+     difference() {
+          circleXY(sr_or);
+          rectangle(-sr_or, sc_co-sr_or, sr_or, -sr_or);
      };
 };
 
 module safety_3d() {
-     difference() {
-          deepify(sf_td) {
-               safety_2d();
-          };
-          deepify(sf_nd) {
-               difference() {
-                    circleXY(sf_sr);
-               };
-          };
+     deepify(sr_length) {
+          safety_2d();
      };
 };
 
-color(sf_color[0], sf_color[1]) {
-     translate(sf_offset) {
-          safety_3d();
+color(sr_color[0], sr_color[1]) {
+     translate(sr_offset) {
+          rotate(sr_rotation) {
+               safety_3d();
+          }
      };
 };

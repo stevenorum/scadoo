@@ -1,3 +1,4 @@
+color(ph_color[0], ph_color[1]) {
 translate([plungerDirection*plungerSegmentLength,0,0]) {
      difference() {
           union() {
@@ -12,4 +13,5 @@ translate([plungerDirection*plungerSegmentLength,0,0]) {
                cylinderAround(plungerOR+plungerWallGap, L=2*plungerWallGap, O=frontPlungerSegmentOrigin, A=cylinderOrientation, IR=plungerOR-plungerWallGap);
           };
      };
+};
 };

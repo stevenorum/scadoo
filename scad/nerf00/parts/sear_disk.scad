@@ -6,8 +6,7 @@ module sear_disk_2d() {
                          [
                               [sd_ir, sd_fa],
                               [sd_or, sd_fta],
-                              [sd_sr, sd_sa],
-                              [sd_or, sd_spa],
+                              [sd_or, sd_tpa],
                               [sd_pr, sd_pa],
                               [sd_cr, sd_pca],
                               [sd_or, sd_ca]

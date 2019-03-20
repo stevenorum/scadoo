@@ -1,4 +1,24 @@
-union() {
+module receiver_body() {}
+
+module receiver_hollow() {}
+
+module receiver_pin_cutouts() {}
+
+module receiver_pins() {}
+
+color(rc_color[0], rc_color[1]) {
+
+     difference() {
+          receiver_body();
+          union(){
+               receiver_hollow();
+               receiver_pin_cutouts();
+          };
+     };
+     receiver_pins();
+
+
+     union() {
      deepify(2) {
           rectangle(-3, cylinderOrigin[1]+cylinderOR, 1.5, cylinderOrigin[1]+cylinderOR+receiverWallThickness);
      };
@@ -35,4 +55,5 @@ union() {
                };
           };
      };
+};
 };

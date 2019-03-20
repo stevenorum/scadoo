@@ -1,3 +1,4 @@
+color(tg_color[0], tg_color[1]) {
 deepify(searDiskThickness) {
      translate(triggerOffset) {
           union() {
@@ -18,4 +19,5 @@ deepify(searDiskThickness) {
                };
           };
      };
+};
 };
