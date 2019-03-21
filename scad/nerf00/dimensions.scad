@@ -3,7 +3,6 @@ $charged = true;
 //$charged = false;
 //$charged = ($t % 2 == 0);
 
-
 // Sear disk dimensions
 // sd_???
 // radii (sd_?r)
@@ -29,6 +28,13 @@ sd_rotation = [0, 0, $charged ? 0 : sd_fa];
 sd_thickness = 0.25;
 sd_offset = [0,0,0];
 
+cy_or = .83; // cylinder outer radius
+cy_wt = .14; // cylinder wall thickness
+cy_ir = cy_or - cy_wt; // cylinder inner radius
+cy_orientation = [0,90,0];
+cy_origin = [0, cy_ir + sd_ir, 0];
+
+
 // Sear catch dimensions
 // sc_???
 sc_ufh = sd_or; // upper front height
@@ -43,24 +49,53 @@ sc_ar = .02; // axle radius
 sc_ah = sc_urw + sc_ar; // axle horizontal offset
 sc_av = sc_ufh - sc_urh; // axle vertical offset
 sc_co = sc_ufw/3; // catch overlap - how much of the catch contacts the sear disk.
-
+sc_flh = sc_co; // front lip height - bump up in front of the sear catch
+/* sc_ax = sc_ufw * 2 / 3; // (relative) axle x coordinate */
+/* sc_ay = sc_ufh  / 3; // (relative) axle y coordinate */
 sc_ax = sc_lfw + sc_lrw - sc_ah; // (relative) axle x coordinate
 sc_ay = sc_ufh - sc_urh - sc_av; // (relative) axle y coordinate
 
 sc_offset = [-(sd_or + sc_ufw - sc_co),-sc_ufh,0];
-sc_rotation = $charged ? 0 : 13;
+sc_rotation = $charged ? 0 : 10;
 
 complainUnless("Front and rear heights of the sear catch do not match!!1!",sc_ufh+sc_lfh == sc_lrh+sc_urh);
 
 // Safety rod dimensions
 // sr_???
-sr_or = sc_co * 2; // safety rod outer radius
+sr_or = sc_co * 2.1; // safety rod outer radius
 sr_length = 3;
-sr_offset = [sc_offset[0]-sr_or, -1.5*sr_or, 0];
+sr_offset = [sc_offset[0]-sr_or, -1*sr_or, 0];
 sr_rotation = [0, 0, $charged ? 0 : 90];
 
 // plunger dimensions
 // ph_??
+ph_margin = 0.02; // gap between cylinder wall and plunger
+ph_fl = sd_ir * 2 * sin(sd_fa/2); // plunger head front length
+ph_ft = ph_fl/2; // face thickness
+ph_ffl = ph_ft;
+ph_frl = ph_fl-ph_ffl;
+ph_ml = sd_or * sin(sd_fa); // middle length
+ph_rl = sd_ir * 2 * sin(sd_fa/2); // rear length
+ph_tl = ph_ml; // tail length
+ph_fr = cy_ir - ph_margin; // front radius
+ph_mr = cy_ir - ph_margin - (sd_or-sd_ir); // middle radius
+ph_rr = cy_ir - ph_margin; // rear radius
+ph_tr = ph_mr; // tail radius
+ph_ir = ph_mr*0.9; // inner radius
+ph_ol = 0.04; // o-ring length
+ph_od = 0.02; // o-ring depth
+
+ph_offset = [-(ph_fl + ph_ml) + ($charged ? 0 : -ph_rl), 0, 0];
+
+ph_ffo = cy_origin + [ph_ffl/2,0,0];
+ph_fro = ph_ffo + [(ph_ffl+ph_frl)/2,0,0];
+ph_mo = ph_fro + [(ph_frl+ph_ml)/2,0,0];
+ph_ro = ph_mo + [(ph_ml)/2 + ph_rl/2,0,0];
+ph_to = ph_ro + [(ph_rl)/2 + ph_tl/2,0,0];
+
+
+
+
 
 // trigger dimensions
 // tg_???
@@ -114,9 +149,3 @@ triggerOffset = triggerOrigin + triggerChargeOffset;
 
 
 
-module safetyOutline() {
-     union() {
-          arc(sf_or, sf_ta, sf_ba, IR=sf_sr);
-          arc(sf_or, sf_da, sf_ba, IR=sf_dr);
-     };
-};

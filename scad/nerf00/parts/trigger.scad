@@ -1,4 +1,14 @@
+module trigger_2d() {
+
+};
+
+module trigger_3d() {
+
+};
+
 color(tg_color[0], tg_color[1]) {
+     trigger_3d();
+     
 deepify(searDiskThickness) {
      translate(triggerOffset) {
           union() {

@@ -12,6 +12,6 @@ include <parts/sear_catch.scad>;
 include <parts/safety.scad>;
 
 include <parts/plunger.scad>;
-//include <parts/trigger.scad>;
+include <parts/trigger.scad>;
 //include <parts/receiver.scad>;
 include <parts/cylinder.scad>;

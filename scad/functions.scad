@@ -117,24 +117,37 @@ module rotateAround(A, X=0, Y=0) {
 };
 
 module cylinderAround(R, L, O=[0,0,0], IR=0, A=[0,0,0]) {
-    translate(O){
-    rotate(a=A){
-    if (IR > 0) {
-        difference() {
-        cylinder(h=L, r=R, $fn=24, center=true);
-        cylinder(h=L*1.1, r=IR, $fn=24, center=true);
-            }
-        } else {
-        cylinder(h=L, r=R, $fn=24, center=true);
-        }
-}}}
+     translate(O) {
+          rotate(a=A) {
+               if (IR > 0) {
+                    difference() {
+                         cylinder(h=L, r=R, $fn=24, center=true);
+                         cylinder(h=L*1.1, r=IR, $fn=24, center=true);
+                    };
+               } else {
+                    cylinder(h=L, r=R, $fn=24, center=true);
+               };
+          };
+     };
+};
 
 module deepify(thickness) {
-    translate([0,0,-thickness/2]) {
-    linear_extrude(thickness) {
-    children();
-    }
+     translate([0,0,-thickness/2]) {
+          linear_extrude(thickness) {
+               children();
+          };
+     };
+};
 
-    }
+module pull(x) {
+     translate([0, 0, x<0 ? x : 0]) {
+          linear_extrude(abs(x)) {
+               children();
+          };
+     };
+};
 
-}
+module mirrorAdd(v) {
+     children();
+     mirror(v=v) children();
+};

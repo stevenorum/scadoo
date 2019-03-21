@@ -1,7 +1,7 @@
 module safety_2d() {
      difference() {
           circleXY(sr_or);
-          rectangle(-sr_or, sc_co-sr_or, sr_or, -sr_or);
+          rectangle(-sr_or, sc_co*1.1-sr_or, sr_or, -sr_or);
      };
 };
 

@@ -2,6 +2,7 @@ module sear_catch_2d() {
      difference() {
           union() {
                rectangle(0, 0, sc_ufw, sc_ufh);
+               rectangleRelative(0, sc_ufh, sc_ufw-sc_co, sc_flh);
                rectangleRelative(sc_lfw, sc_ufh-sc_urh, sc_lrw, -sc_lrh);
                arc(max(sc_ax, sc_ay), 90, 180, X=sc_ax, Y=sc_ay);
           };
