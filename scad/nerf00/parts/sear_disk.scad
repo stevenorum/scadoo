@@ -1,31 +1,49 @@
+use <../../functions.scad>;
+include <../dimensions.scad>;
+
+module sear_disk_add_2d() {
+     difference() {
+     union() {
+          arcs(
+               [
+                    [sd_ir, sd_fa],
+                    [sd_or, sd_fta],
+                    [sd_or, sd_sa],
+                    [sd_or, sd_spa],
+                    [sd_or, sd_pa],
+                    [sd_cr, sd_pca],
+                    [sd_or, sd_ca]
+                    ]
+               );
+     };
+     union() {
+          
+          arc(sds_or, sds_ta, sds_sa, IR=sds_ir);
+     };
+     };
+}
+
+module sear_disk_subtract_2d() {
+     circleXY(sd_ar);
+}
+
 module sear_disk_2d() {
      rotate(sd_rotation) {
           difference() {
-               union() {
-                    arcs(
-                         [
-                              [sd_ir, sd_fa],
-                              [sd_or, sd_fta],
-                              [sd_or, sd_tpa],
-                              [sd_pr, sd_pa],
-                              [sd_cr, sd_pca],
-                              [sd_or, sd_ca]
-                              ]
-                         );
-               };
-               circleXY(sd_ar);
+               sear_disk_add_2d();
+               sear_disk_subtract_2d();
           };
      };
 };
 
-module sear_disk_3d() {
+module sear_disk_3d_raw() {
      deepify(sd_thickness) {
           sear_disk_2d();
      };
 };
 
-color(sd_color[0], sd_color[1]) {
+module sear_disk_3d() {
      translate(sd_offset) {
-          sear_disk_3d();
+          sear_disk_3d_raw();
      };
 };

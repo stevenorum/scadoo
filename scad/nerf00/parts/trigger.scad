@@ -1,33 +1,49 @@
-module trigger_2d() {
+use <../../functions.scad>;
+include <../dimensions.scad>;
 
+module trigger_2d_add() {
+     difference() {
+          union() {
+               rectangleRelative(0, 0, tg_tw, -tg_tl);
+               rectangleRelative(tg_tw, -tg_tl, tg_bl, tg_bh);
+               rectangleRelative(-tg_pd/2, -tg_tl, tg_pd, -tg_ph);
+               polygon([[0,0],[-tg_pd/2, -tg_tl],[0,-tg_tl]]);
+               rectangleRelative(0,0,-tg_sf,-tg_sh);
+               arc(tgs_or, tgs_ta, tgs_sa, X=tg_ax, Y=tg_ay);
+          };
+          union(){
+               arc(tg_cr, 90, 45, X=tg_cd-tg_cr-tg_pd/2, Y=-tg_tl-tg_ph/2);
+               // round off the corner nearest the sear catch and safety
+               arc(abs(tg_ax) + abs(tg_ay), 90, X=tg_ax, Y=tg_ay, IR=max(abs(tg_ax),abs(tg_ay)));
+               arc(tgs_or-cs_ors, tgs_ta-20, tgs_sa+10, IR=tgs_or-3*cs_ors-$iota, X=tg_ax, Y=tg_ay);
+          };
+     };
+
+};
+
+module trigger_2d_subtract() {
+          union(){
+               circleXY(tg_ar, X=tg_ax, Y=tg_ay); // pivot axle
+          };
+};
+
+module trigger_2d() {
+     difference() {
+          trigger_2d_add();
+          trigger_2d_subtract();
+     };
+};
+
+module trigger_3d_raw() {
+     deepify(sd_thickness) {
+          trigger_2d();
+     };
 };
 
 module trigger_3d() {
-
-};
-
-color(tg_color[0], tg_color[1]) {
-     trigger_3d();
-     
-deepify(searDiskThickness) {
-     translate(triggerOffset) {
-          union() {
-               difference() {
-                    union() {
-                         arc(0.6, 180, IR=0.4);
-                         rectangle(0,0,1,.5);
-                         rectangle(-1,.25,1,.75);
-                         rectangle(0.25, 0, 1.45, .5);
-                    };
-                    union() {
-                         arc(0.4, 360); // Not needed for the trigger arc, but necessary to cut off some rectangle bits.
-                         arc(.5, 180, IR=.25, X=1.2, Y=.25);
-                         rectangle(0,0,-2, .4);
-                         rectangle(-.75,.525,.75,.65);
-                         rectangle(0.5, .25, 1.25, .375);
-                    };
-               };
+     translate(tg_offset) {
+          rotateAround(tg_rotation, X=tg_ax, Y=tg_ay) {
+               trigger_3d_raw();
           };
      };
-};
 };

@@ -1,3 +1,8 @@
+// This is the conversion between mm and whatever unit we want to use.
+// Default is inches because that's what I've been using for the nerf gun I'm working on.
+$fn = 48;
+$UNIT = 25.4;
+
 module warn(s) {
      echo(str("<h1 style='color:red'>", s, "</h1>"));
      // Using the undefined variable 'bar' triggers a warning, which ensures that I look at the console and see the big red message.
@@ -24,16 +29,16 @@ module rectangleRelative(x1, y1, x2, y2) {
      rectangle(x1, y1, x1+x2, y1+y2);
 };
 
-module semicircle(R, sides=24) {
+module semicircle(R) {
     intersection() {
-        circle(R, $fn=sides, center=true);
+        circle(R, center=true);
         translate([R, 0, 0]) {
             square(R*2, center=true);
         };
     };
 };
 
-module arc ( R, A=360, O=0, sides=24, X=0, Y=0, IR=0) {
+module arc ( R, A=360, O=0, X=0, Y=0, IR=0) {
      // Creates the arc starting on the Y axis and rotating clockwise.
      // O is the offset angle of the start, going clockwise.
      //direction = A >= 0 ? -1 : 1;
@@ -45,17 +50,17 @@ module arc ( R, A=360, O=0, sides=24, X=0, Y=0, IR=0) {
                          if (A >= 180) {
                               union() {
                                    rotate([0,0,180-abs(A)]) {
-                                        semicircle(R, sides);
+                                        semicircle(R);
                                    };
-                                   semicircle(R, sides);
+                                   semicircle(R);
                               };
                          };
                          if (A < 180) {
                               intersection() {
                                    rotate([0,0,180-abs(A)]) {
-                                        semicircle(R, sides);
+                                        semicircle(R);
                                    };
-                                   semicircle(R, sides);
+                                   semicircle(R);
                               };
                          };
                     };
@@ -63,7 +68,7 @@ module arc ( R, A=360, O=0, sides=24, X=0, Y=0, IR=0) {
           };
           union() {
                if (IR > 0) {
-                    arc(R=IR, A=A+1, O=O-0.5, sides=sides, X=X, Y=Y, IR=0);
+                    arc(R=IR, A=A+1, O=O-0.5, X=X, Y=Y, IR=0);
                };
           };
      };
@@ -78,9 +83,16 @@ function sumRange(v, first=0, last=-1, index=0) = 0 + ((first >= lastIndex(v, la
 module arcs(R_A, X=0, Y=0) {
      union() {
           for (i = [0:len(R_A)]) {
-               start_angle = sumRange(R_A, last=i, index=1);
-               arc(R_A[i][0], R_A[i][1], start_angle, X=X, Y=Y);
-               // Consider having the smaller arcs overlap with adjacent larger arcs slightly to get rid of possible hidden edges in the model.
+               // The extra logic in here is to have the arcs overlap somewhat to prevent interior seams.
+               // In my experience, it's a tossup whether they'll be handled properly (as one continuous piece)
+               // or not (as two separate pieces that happen to be distance 0 apart).
+               // Even in a single circle of arcs generated with this function without the overlap,
+               // sometimes it was correct, and sometimes it wasn't.
+               start_offset_angle = (i > 0 && R_A[i][0] <= R_A[i-1][0]) ? (R_A[i-1][1])/2 : 0;
+               end_offset_angle = (i < len(R_A)-1 && R_A[i][0] <= R_A[i+1][0]) ? (R_A[i+1][1])/2 : 0;
+               start_angle = sumRange(R_A, last=i, index=1) - start_offset_angle;
+               segment_angle = R_A[i][1] + start_offset_angle + end_offset_angle;
+               arc(R_A[i][0], segment_angle, start_angle, X=X, Y=Y);
           };
      };
 };
@@ -88,7 +100,7 @@ module arcs(R_A, X=0, Y=0) {
 module circleXY(R, X=0, Y=0, IR=0) {
      difference() {
           translate([X, Y, 0]) {
-               circle(R, center=true, $fn=24);
+               circle(R, center=true);
           };
           union() {
                if (IR > 0) {
@@ -101,7 +113,7 @@ module circleXY(R, X=0, Y=0, IR=0) {
 module circlePolar(R, theta=0, length=0) {
     rotate([0,0,theta]) {
         translate([length, 0, 0]) {
-            circle(R, center=true, $fn=24);
+            circle(R, center=true);
         }
     }
 }
@@ -121,11 +133,11 @@ module cylinderAround(R, L, O=[0,0,0], IR=0, A=[0,0,0]) {
           rotate(a=A) {
                if (IR > 0) {
                     difference() {
-                         cylinder(h=L, r=R, $fn=24, center=true);
-                         cylinder(h=L*1.1, r=IR, $fn=24, center=true);
+                         cylinder(h=L, r=R, center=true);
+                         cylinder(h=L*1.1, r=IR, center=true);
                     };
                } else {
-                    cylinder(h=L, r=R, $fn=24, center=true);
+                    cylinder(h=L, r=R, center=true);
                };
           };
      };

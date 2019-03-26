@@ -1,36 +1,94 @@
+use <nerf_functions.scad>;
+
+$fn=96;
+
+$iota = .01;
 charged = true;
 $charged = true;
 //$charged = false;
 //$charged = ($t % 2 == 0);
 
+cs_ors = (7/32)/2; // smaller compression spring outer radius
+cs_irs = (5/32)/2; // smaller compression spring inner radius
+cs_ls_short = 11/16; // also have the same diameter in 1 1/2 inch length
+cs_ls_long = 1.5;
+cs_orl = (1/4)/2; // larger compression spring outer radius
+cs_irl = (3/16)/2; // larger compression spring inner radius
+cs_ll = 13/32;
+cs_thickness = 1/32;
+
 // Sear disk dimensions
 // sd_???
 // radii (sd_?r)
-sd_or = 0.5; // face outer radius
+sd_or = 0.6; // face outer radius
 sd_ir = 0.4; // face inner radius
-sd_ar = 0.05; // axle radius
+/* sd_ar = 0.0775/2; // axle radius */
+sd_ar = (2.5/25.4)/2; // axle radius
 // dependent
 sd_pr = sd_or*1.5; // pushrod radius
 sd_cr = sd_ir/1.25; // catch radius
+sd_sr = sd_pr; // spring radius
 // angles (sd_?a)
 // Order (clockwise from top): fa, fta, sa, spa, pa, pca, ca
 sd_fa = acos(sd_ir/sd_or); // face angle
-sd_pa = 25; // pushrod angle
+sd_pa = 55; // pushrod angle
 sd_ca = 85; // catch angle
 // dependent
-sd_fta = 90 - sd_fa; // face trailing angle
-sd_tpa = 180-(sd_fa+sd_fta); // trail-to-pushrod angle
+sd_fta = 120 - sd_fa; // face trailing angle
+sd_sa = 15; // spring angle
+sd_spa = 180-(sd_fa+sd_fta+sd_sa); // spring-to-pushrod angle
 sd_pca = 180-(sd_ca+sd_pa); // pushrod-to-catch angle
 
-complainUnless("The sear disk angles do not add up to 360!!1!", (sd_fa+sd_fta+sd_tpa+sd_pa+sd_pca+sd_ca) == 360);
+sds_sa = 90;
+sds_ta = 120;
+sds_ir = sd_cr-cs_ors;
+sds_or = sds_ir+2*cs_ors+$iota;
+
+rc_sds_sa = 140;
+rc_sds_ta = 20;
+rc_sds_ir = sds_ir + $iota;
+rc_sds_or = sds_or - $iota;
+
+complainUnless("The sear disk angles do not add up to 360!!1!", (sd_fa+sd_fta+sd_sa+sd_spa+sd_pa+sd_pca+sd_ca) == 360);
 
 sd_rotation = [0, 0, $charged ? 0 : sd_fa];
 sd_thickness = 0.25;
 sd_offset = [0,0,0];
 
-cy_or = .83; // cylinder outer radius
-cy_wt = .14; // cylinder wall thickness
-cy_ir = cy_or - cy_wt; // cylinder inner radius
+rc_inner_gap = sd_thickness + $iota;
+
+rc_wall = 0.15;
+rc_offset = [0,0,(rc_wall+sd_thickness)/2];
+rc_fx = -3;
+rc_fy = -1.5;
+rc_rx = 1.5;
+rc_ry = 0.5;
+rc_rt = 1;
+
+rc_sr = 1/16;
+
+// BARREL
+// Not going to be printed, but need dimensions for sizing the printed parts.
+// These measurements are for the carbon-fiber barrel.
+br_or = 0.63/2; // barrel outer radius, measured
+br_ir = 0.51/2; // barrel inner radius, measured
+br_length = 16; // I think I have 18 or 20 inches of CF tube.  This number is guaranteed to change.
+
+// SPRING
+// Not going to be printed.  This is an AR buffer spring.
+sp_or = 1/2;
+sp_ir = 0.75/2;
+
+// CYLINDER
+// Not going to be printed, but need dimensions for sizing the printed parts.
+/* cy_or = .83; // cylinder outer radius, canonical */
+/* cy_wt = .14; // cylinder wall thickness, canonical */
+/* cy_ir = cy_or - cy_wt; // cylinder inner radius */
+/* cy_or = 1.665/2; // cylinder outer radius, measured, 1 1/4 pvc */
+/* cy_ir = 1.365/2; // cylinder inner radius, measured, 1 1/4 pvc */
+cy_or = 1.905/2 + $iota; // cylinder outer radius, measured, 1 1/2 pvc
+cy_ir = 1.595/2; // cylinder inner radius, measured, 1 1/2 pvc
+cy_wt = cy_or-cy_ir; // cylinder wall thickness
 cy_orientation = [0,90,0];
 cy_origin = [0, cy_ir + sd_ir, 0];
 
@@ -39,51 +97,74 @@ cy_origin = [0, cy_ir + sd_ir, 0];
 // sc_???
 sc_ufh = sd_or; // upper front height
 sc_lfh = sd_or*0.8; // lower front height
-sc_urh = sd_or*0.8; // upper rear height
+sc_urh = sd_or*0.75; // upper rear height
 sc_lrh = sc_ufh + sc_lfh - sc_urh; // lower rear height
 sc_lfw = sd_or*0.3; // lower front width
 sc_lrw = sd_or*0.4; // lower rear width
 sc_ufw = sd_or*0.5; // upper front width
 sc_urw = sd_or*0.2; // upper rear width
-sc_ar = .02; // axle radius
+sc_ar = sd_ar; // axle radius
 sc_ah = sc_urw + sc_ar; // axle horizontal offset
 sc_av = sc_ufh - sc_urh; // axle vertical offset
 sc_co = sc_ufw/3; // catch overlap - how much of the catch contacts the sear disk.
+sc_co_gap = sc_ufw/3; // catch overlap gap - how much of a gap is there between the sear disk and the wall at the front of the catch
 sc_flh = sc_co; // front lip height - bump up in front of the sear catch
 /* sc_ax = sc_ufw * 2 / 3; // (relative) axle x coordinate */
 /* sc_ay = sc_ufh  / 3; // (relative) axle y coordinate */
 sc_ax = sc_lfw + sc_lrw - sc_ah; // (relative) axle x coordinate
 sc_ay = sc_ufh - sc_urh - sc_av; // (relative) axle y coordinate
 
+scs_radius = cs_irs;
+scs_orientation = [0,90,0];
+scs_length = cs_ls_short/4;
+scs_origin = [sc_lfw+sc_lrw, -sc_lrh+(cs_ors+cs_thickness)*2, 0];
 sc_offset = [-(sd_or + sc_ufw - sc_co),-sc_ufh,0];
 sc_rotation = $charged ? 0 : 10;
+sc_aax = sc_ax + sc_offset[0];
+sc_aay = sc_ay + sc_offset[1];
 
-complainUnless("Front and rear heights of the sear catch do not match!!1!",sc_ufh+sc_lfh == sc_lrh+sc_urh);
+// Floating-point numbers are annoying to compare.
+complainUnless("Front and rear heights of the sear catch do not match!!1!",abs(sc_ufh+sc_lfh - (sc_lrh+sc_urh))<0.0001);
+
+scs_or = sc_lrh-cs_ors;
+scs_ir = sc_lrh-3*cs_ors - $iota;
+scs_sa = 115;
+scs_ta = 60;
+rc_scs_or = scs_or - $iota;
+rc_scs_ir = scs_ir + $iota;
+rc_scs_sa = scs_sa + 5;
+rc_scs_ta = 10;
+
 
 // Safety rod dimensions
 // sr_???
 sr_or = sc_co * 2.1; // safety rod outer radius
-sr_length = 3;
+sr_length = sd_thickness + rc_wall*2;
 sr_offset = [sc_offset[0]-sr_or, -1*sr_or, 0];
-sr_rotation = [0, 0, $charged ? 0 : 90];
+sr_rotation = [0, 0, $charged ? 0 : -90];
+sr_hr = 1.1*sr_or; // safety handle radius
+sr_hl = 3*sr_or; // safety handle length
+sr_ht = sd_thickness; // safety handle thickness
 
 // plunger dimensions
 // ph_??
-ph_margin = 0.02; // gap between cylinder wall and plunger
+ph_ot = 0.11; // o-ring thickness
+ph_ol = 0.1; // o-ring groove length
+ph_od = 3*ph_ol/4; // o-ring groove depth
+ph_margin = ph_ot-ph_od; // gap between cylinder wall and plunger
+ph_catch_margin = .01;
 ph_fl = sd_ir * 2 * sin(sd_fa/2); // plunger head front length
-ph_ft = ph_fl/2; // face thickness
+ph_ft = ph_fl; // face thickness
 ph_ffl = ph_ft;
 ph_frl = ph_fl-ph_ffl;
-ph_ml = sd_or * sin(sd_fa); // middle length
+ph_ml = sd_or * sin(sd_fa) * 2; // middle length
 ph_rl = sd_ir * 2 * sin(sd_fa/2); // rear length
 ph_tl = ph_ml; // tail length
 ph_fr = cy_ir - ph_margin; // front radius
-ph_mr = cy_ir - ph_margin - (sd_or-sd_ir); // middle radius
+ph_mr = cy_ir - ph_catch_margin - (sd_or-sd_ir); // middle radius
 ph_rr = cy_ir - ph_margin; // rear radius
-ph_tr = ph_mr; // tail radius
-ph_ir = ph_mr*0.9; // inner radius
-ph_ol = 0.04; // o-ring length
-ph_od = 0.02; // o-ring depth
+ph_ir = sp_or; // inner radius - this is currently perfect
+ph_tr = ph_ir+0.1; // tail radius
 
 ph_offset = [-(ph_fl + ph_ml) + ($charged ? 0 : -ph_rl), 0, 0];
 
@@ -99,6 +180,45 @@ ph_to = ph_ro + [(ph_rl)/2 + ph_tl/2,0,0];
 
 // trigger dimensions
 // tg_???
+
+/* tg_tl = sc_ufh + sc_lfh; */
+tg_tl = (sc_urh + sc_lrh + 0.1)/2;
+tg_tw = 0.3;
+
+tg_bl = 0.3;
+tg_bh = 0.2;
+
+tg_ar = sd_ar;
+tg_ax = tg_tw/2;
+tg_ay = -tg_tl/4;
+
+tg_pd = 2*tg_tw; // trigger pull depth (how wide the trigger itself is, not the trigger pull distance)
+tg_ph = 1.25; // trigger pull height (how tall the visible part of the trigger is)
+tg_cr = 1; // trigger curvature radius
+tg_cd = tg_pd/2; // trigger curvature depth
+
+tg_sf = 0.5;
+tg_sh = abs(tg_ay) * 2;
+
+tgs_or = 1;
+tgs_ogr = tgs_or - cs_ors;
+tgs_igr = tgs_ogr - 2*cs_ors - $iota;
+tgs_sa = 240;
+tgs_ta = 90;
+
+tgs_la = 15;
+tga_ta = 15;
+
+rc_tgs_sa = tgs_sa + tgs_la + 10;
+rc_tgs_ta = 10;
+rc_tgs_ogr = tgs_ogr - $iota;
+rc_tgs_igr = tgs_igr + $iota;
+
+tg_offset = [sc_offset[0] - tg_bl - tg_tw + sc_lfw, -tg_tl, 0];
+tg_rotation = [0, 0, $charged ? -5 : 10];
+
+tg_aax = tg_offset[0] + tg_ax;
+tg_aay = tg_offset[1] + tg_ay;
 
 // receiver dimensions
 // rc_???
@@ -146,6 +266,3 @@ safetyPosition = charged ? searDiskThickness*1.5 : 0;
 triggerChargeOffset = charged ? [0,0,0] : [.1,0,0];
 
 triggerOffset = triggerOrigin + triggerChargeOffset;
-
-
-

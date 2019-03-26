@@ -1,8 +1,14 @@
-// CYLINDER - will actually be PVC.
-//color("white", alpha=0.2){ // Cylinder interior
-//     cylinderAround(cylinderIR, L=10, O=cylinderOrigin, A=cylinderOrientation);
-//};
+use <../../functions.scad>;
+include <../dimensions.scad>;
 
-color("lime", alpha=0.5){ // Cylinder exterior
-     cylinderAround(cylinderOR, L=10, O=cylinderOrigin, IR=cylinderIR, A=cylinderOrientation);
+module cylinderExterior() {
+     cylinderAround(cy_or, L=12, O=cy_origin, A=cy_orientation);
+};
+
+module cylinder_interior_3d() {
+     cylinderAround(cy_ir, L=10+$iota, O=cy_origin, A=cy_orientation);
+};
+
+module cylinder_exterior_3d() {
+     cylinderAround(cy_or, L=10, O=cy_origin, IR=cy_ir, A=cy_orientation);
 };
