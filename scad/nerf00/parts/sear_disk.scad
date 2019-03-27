@@ -15,9 +15,9 @@ module sear_disk_add_2d() {
                     [sd_or, sd_ca]
                     ]
                );
+          circleXY(sd_aor);
      };
      union() {
-          
           arc(sds_or, sds_ta, sds_sa, IR=sds_ir);
      };
      };
@@ -25,6 +25,10 @@ module sear_disk_add_2d() {
 
 module sear_disk_subtract_2d() {
      circleXY(sd_ar);
+}
+
+module sear_disk_axle_2d() {
+     circleXY(sd_ar-$iota);
 }
 
 module sear_disk_2d() {

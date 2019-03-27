@@ -5,7 +5,7 @@ $fn=96;
 $iota = .01;
 charged = true;
 $charged = true;
-//$charged = false;
+$charged = false;
 //$charged = ($t % 2 == 0);
 
 cs_ors = (7/32)/2; // smaller compression spring outer radius
@@ -23,7 +23,8 @@ cs_thickness = 1/32;
 sd_or = 0.6; // face outer radius
 sd_ir = 0.4; // face inner radius
 /* sd_ar = 0.0775/2; // axle radius */
-sd_ar = (2.5/25.4)/2; // axle radius
+// sd_ar = (2.5/25.4)/2; // axle radius
+sd_ar = .125/2; // axle radius
 // dependent
 sd_pr = sd_or*1.5; // pushrod radius
 sd_cr = sd_ir/1.25; // catch radius
@@ -38,6 +39,8 @@ sd_fta = 120 - sd_fa; // face trailing angle
 sd_sa = 15; // spring angle
 sd_spa = 180-(sd_fa+sd_fta+sd_sa); // spring-to-pushrod angle
 sd_pca = 180-(sd_ca+sd_pa); // pushrod-to-catch angle
+
+sd_aor = sd_ar*3;
 
 sds_sa = 90;
 sds_ta = 120;
@@ -113,6 +116,8 @@ sc_flh = sc_co; // front lip height - bump up in front of the sear catch
 /* sc_ay = sc_ufh  / 3; // (relative) axle y coordinate */
 sc_ax = sc_lfw + sc_lrw - sc_ah; // (relative) axle x coordinate
 sc_ay = sc_ufh - sc_urh - sc_av; // (relative) axle y coordinate
+sc_aor = sc_ar*3;
+sc_exc_angle = sd_fa+sd_fta+sd_sa+sd_spa+sd_pa+sd_pca/4;
 
 scs_radius = cs_irs;
 scs_orientation = [0,90,0];
@@ -175,6 +180,29 @@ ph_ro = ph_mo + [(ph_ml)/2 + ph_rl/2,0,0];
 ph_to = ph_ro + [(ph_rl)/2 + ph_tl/2,0,0];
 
 
+// bolt dimensions
+// bh_??
+bh_ot_cy = ph_ot; // o-ring thickness
+bh_ol_cy = ph_ol; // o-ring groove length
+bh_od_cy = ph_od; // o-ring groove depth
+bh_margin = ph_margin;
+bh_or_cy = ph_fr; // outer radius, cylinder section
+bh_or_ch = 5/16; // outer radius, chamber section
+bh_wall_thickness = .1;
+bh_ir = bh_or_ch - bh_wall_thickness;
+bh_l_ch = 6;
+bh_l_cy = 0.75;
+bh_o_cy = cy_origin + [-1, 0, 0];
+bh_o_ch = bh_o_cy + [-(bh_l_cy+bh_l_ch)/2, 0, 0];
+bh_ft_cy = ph_ft;
+bh_offset = [ph_offset[0] + ($charged ? 0 : -1), 0, 0];
+
+bh_l_br = 1;
+bh_or_br = br_ir - $iota; // OR of the part that goes into the barrel.  I still need to add the oring stuff to this part.
+bh_ir_br = bh_or_br*0.75;
+bh_o_br = bh_o_ch + [-(bh_l_ch+bh_l_br)/2, 0, 0];
+
+
 
 
 
@@ -191,6 +219,8 @@ tg_bh = 0.2;
 tg_ar = sd_ar;
 tg_ax = tg_tw/2;
 tg_ay = -tg_tl/4;
+
+tg_aor = tg_ar*3; // trigger axle outer radius
 
 tg_pd = 2*tg_tw; // trigger pull depth (how wide the trigger itself is, not the trigger pull distance)
 tg_ph = 1.25; // trigger pull height (how tall the visible part of the trigger is)

@@ -2,18 +2,21 @@ use <../../functions.scad>;
 include <../dimensions.scad>;
 
 module receiver_pin_cutouts() {
+     // Screw holes to connect to other half
      circleXY(rc_sr, X=rc_fx+1/4, Y=rc_fy+1/4);
      circleXY(rc_sr, X=rc_fx+1/4, Y=rc_fy+1/4+1);
      circleXY(rc_sr, X=rc_rx-1/4, Y=rc_fy+1/4);
      circleXY(rc_sr, X=rc_rx-1/4, Y=rc_fy+1/4+1);
+     // safety hole
+     translate(sr_offset) {
+          safety_cutout_2d();
+     };
+     // axle pins
      translate(sd_offset) {
           sear_disk_subtract_2d();
      };
      translate(sc_offset) {
           sear_catch_subtract_2d();
-     };
-     translate(sr_offset) {
-          safety_cutout_2d();
      };
      translate(tg_offset) {
           trigger_2d_subtract();
@@ -54,6 +57,20 @@ module receiver_spring_blocks() {
           arc(rc_sds_or, rc_sds_ta, rc_sds_sa, IR=rc_sds_ir); // spring for sear disk
           arc(rc_scs_or, rc_scs_ta, rc_scs_sa, IR=rc_scs_ir, X=sc_aax, Y=sc_aay); // spring for sear catch
           arc(rc_tgs_ogr, rc_tgs_ta, rc_tgs_sa, IR=rc_tgs_igr, X=tg_aax, Y=tg_aay); // spring for trigger
+     };
+};
+
+module receiver_axle_pins() {
+     deepify(rc_inner_gap) {
+          translate(sd_offset) {
+               sear_disk_axle_2d();
+          };
+          translate(sc_offset) {
+               sear_catch_axle_2d();
+          };
+          translate(tg_offset) {
+               trigger_axle_2d();
+          };
      };
 };
 
