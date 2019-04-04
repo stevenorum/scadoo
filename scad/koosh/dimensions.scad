@@ -2,21 +2,21 @@ use <../functions.scad>;
 include <../constants.scad>;
 
 $iota = 0.001;
-multiplier = 25.4;
+$multiplier = 25.4;
 
 ring_length = 0.5;
-ring_max_thickness = 0.1;
+ring_max_thickness = 0.075;
 ring_inner_diameter = 1.25;
 ring_outer_diameter = ring_inner_diameter + 2* ring_max_thickness;
 ring_inner_radius = ring_inner_diameter / 2;
 ring_outer_radius = ring_outer_diameter / 2;
-ring_leading_edge_thickness = 0;
-ring_trailing_edge_thickness = 0;
-ring_leading_section_length = 0.1;
+ring_leading_edge_thickness = 0.02;
+ring_trailing_edge_thickness = 0.02;
+ring_leading_section_length = 0.15;
 ring_trailing_section_length = 0.3;
 ring_middle_section_length = ring_length - ring_leading_section_length - ring_trailing_section_length;
-ring_fin_count = 6;
-ring_fin_angle = 45;
+ring_fin_count = 8;
+ring_fin_angle = 30;
 ring_fin_thickness = 0.05;
 
 ring_leading_origin = [0,0,ring_leading_section_length/2];
@@ -27,12 +27,14 @@ ring_trailing_origin = [0,0,ring_leading_section_length + ring_middle_section_le
 module circularAirfoil(sections) {
      for (i = [0:len(sections)-1]) {
           section = sections[i];
+          echo(section);
           lng = section[0];
           or1 = section[1];
           ir1 = (len(section) >= 3) ? section[2] : -1;
           or2 = (len(section) >= 4) ? section[3] : -1;
           ir2 = (len(section) >= 5) ? section[4] : -1;
-          section_origin = [0,0,sumRange(sections, last=i, index=0) + lng/2];
+          section_origin = [0,0,sumRange(sections, last=i, index=0)+lng/2];
+          echo(section_origin);
           cylinderAround(R=or1,
                          L=lng,
                          IR=ir1,
@@ -41,6 +43,30 @@ module circularAirfoil(sections) {
                          O=section_origin);
      };
 };
+
+module smoothify(L, OR1, IR1, OR2=-1, IR2=-1, steps=5, factor=0.5, origin=[0,0,0]) {
+     sect_length = L/steps;
+     _OR2 = OR2 <= 0 ? OR1 : OR2;
+     _IR2 = IR2 <= 0 ? IR1 : IR2;
+     // The logic here is hilariously janky and probably not good, but it's good enough for me for now.
+     // It only produces a convex trailing edge for steps=2, so that's not ideal, also.
+     // Also, the last two sections are a bit weird due to how it does the smoothing
+     // (it tries to smooth directly to the end, instead of smoothing past and truncating.)
+     mid_outer_radii = [ for (i = [1 : 1 : steps-1]) OR1 + (_OR2-OR1)*(1-pow(factor, i)) ];
+     mid_inner_radii = [ for (i = [1 : 1 : steps-1]) IR1 + (_IR2-IR1)*(1-pow(factor, i)) ];
+     outer_radii = concatenate([OR1],concatenate(mid_outer_radii,[_OR2]));
+     inner_radii = concatenate([IR1],concatenate(mid_inner_radii,[_IR2]));
+     sections = [ for (i = [0 : 1 : steps-1])
+               [sect_length, outer_radii[i], inner_radii[i], outer_radii[i+1], inner_radii[i+1]]
+          ];
+     translate(origin) {
+          circularAirfoil(sections);
+     };
+};
+
+
+
+
 
 start_or = ring_inner_radius + ring_leading_edge_thickness;
 end_or = ring_outer_radius;
@@ -51,15 +77,22 @@ start_ir = ring_inner_radius;
 end_ir = ring_inner_radius;
 ir_diff = end_ir-start_ir;
 
-sections = [
-     [sect_lng, start_or, start_ir, start_or+or_diff*0.4],
-     [sect_lng, start_or+or_diff*0.4, start_ir, start_or+or_diff*0.7],
-     [sect_lng, start_or+or_diff*0.7, start_ir, start_or+or_diff*0.9],
-     [sect_lng, start_or+or_diff*0.9, start_ir, start_or+or_diff*1.0],
-     ];
 
-circularAirfoil(sections);
 
+scale([$multiplier,$multiplier,$multiplier]) {
+union() {
+
+
+/* circularAirfoil(sections); */
+smoothify(ring_leading_section_length,
+          OR1=ring_inner_radius + ring_leading_edge_thickness,
+          IR1=ring_inner_radius,
+          OR2=ring_outer_radius,
+          IR2=ring_inner_radius,
+          steps=5,
+          factor=0.5,
+          origin=ring_leading_origin-[0,0,ring_leading_section_length/2]
+     );
 /* cylinderAround(R=ring_inner_radius + ring_leading_edge_thickness, */
 /*                L=ring_leading_section_length, */
 /*                IR=ring_inner_radius, */
@@ -69,11 +102,20 @@ cylinderAround(R=ring_outer_radius,
                L=ring_middle_section_length,
                IR=ring_inner_radius,
                O=ring_middle_origin);
-cylinderAround(R=ring_outer_radius,
-               L=ring_trailing_section_length,
-               IR=ring_inner_radius,
-               R2=ring_inner_radius + ring_trailing_edge_thickness,
-               O=ring_trailing_origin);
+smoothify(ring_trailing_section_length,
+          OR1=ring_outer_radius,
+          IR1=ring_inner_radius,
+          OR2=ring_inner_radius + ring_trailing_edge_thickness,
+          IR2=ring_inner_radius,
+          steps=2,
+          origin=ring_trailing_origin-[0,0,ring_trailing_section_length/2],
+          factor=.6
+     );
+/* cylinderAround(R=ring_outer_radius, */
+/*                L=ring_trailing_section_length, */
+/*                IR=ring_inner_radius, */
+/*                R2=ring_inner_radius + ring_trailing_edge_thickness, */
+/*                O=ring_trailing_origin); */
 
 if (ring_fin_count > 0) {
      circumference = $PI * ring_outer_diameter;
@@ -106,4 +148,8 @@ if (ring_fin_count > 0) {
                };
           };
      };
+};
+
+
+};
 };

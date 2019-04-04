@@ -3,6 +3,7 @@
 $fn = 48;
 $UNIT = 25.4;
 $PI = 3.14159;
+
 module warn(s) {
      echo(str("<h1 style='color:red'>", s, "</h1>"));
      // Using the undefined variable 'bar' triggers a warning, which ensures that I look at the console and see the big red message.
@@ -178,3 +179,6 @@ module mirrorAdd(v) {
      children();
      mirror(v=v) children();
 };
+
+function concatenate(L1, L2) = [for (i=[0:len(L1)+len(L2)-1]) 
+                        i < len(L1)? L1[i] : L2[i-len(L1)]] ;
