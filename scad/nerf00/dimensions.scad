@@ -92,8 +92,12 @@ sp_ir = 0.75/2;
 cy_or = 1.905/2 + $iota; // cylinder outer radius, measured, 1 1/2 pvc
 cy_ir = 1.595/2; // cylinder inner radius, measured, 1 1/2 pvc
 cy_wt = cy_or-cy_ir; // cylinder wall thickness
+cy_length = 9;
+cy_rside = 2;
+cy_lshift = cy_length/2 - cy_rside;
 cy_orientation = [0,90,0];
 cy_origin = [0, cy_ir + sd_ir, 0];
+cy_translate = [-cy_lshift, 0, 0];
 
 
 // Sear catch dimensions
@@ -190,18 +194,18 @@ bh_or_cy = ph_fr; // outer radius, cylinder section
 bh_or_ch = 5/16; // outer radius, chamber section
 bh_wall_thickness = .1;
 bh_ir = bh_or_ch - bh_wall_thickness;
-bh_l_ch = 6;
+bh_l_ch = 4;
 bh_l_cy = 0.75;
 bh_o_cy = cy_origin + [-1, 0, 0];
 bh_o_ch = bh_o_cy + [-(bh_l_cy+bh_l_ch)/2, 0, 0];
 bh_ft_cy = ph_ft;
-bh_offset = [ph_offset[0] + ($charged ? 0 : -1), 0, 0];
 
 bh_l_br = 1;
 bh_or_br = br_ir - $iota; // OR of the part that goes into the barrel.  I still need to add the oring stuff to this part.
 bh_ir_br = bh_or_br*0.75;
 bh_o_br = bh_o_ch + [-(bh_l_ch+bh_l_br)/2, 0, 0];
 
+bh_offset = [ph_offset[0] + ($charged ? 0.5 : -(bh_l_ch + bh_l_br)+1), 0, 0];
 
 
 
@@ -252,6 +256,26 @@ tg_aay = tg_offset[1] + tg_ay;
 
 // receiver dimensions
 // rc_???
+
+magwell_length = 4;
+magwell_width = 2;
+magwell_hole_length = 3;
+magwell_hole_width = 1;
+magwell_height = 2;
+
+magwell_offset = [cy_translate[0]-cy_length/2-magwell_length,-magwell_height,0];
+
+
+barrel_feed_diameter = 0;
+barrel_feed_length = 0;
+
+
+
+
+
+
+
+
 
 searOR = 0.5;
 searCatchHeight = .1;

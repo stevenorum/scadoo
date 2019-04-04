@@ -2,7 +2,7 @@
 // Default is inches because that's what I've been using for the nerf gun I'm working on.
 $fn = 48;
 $UNIT = 25.4;
-
+$PI = 3.14159;
 module warn(s) {
      echo(str("<h1 style='color:red'>", s, "</h1>"));
      // Using the undefined variable 'bar' triggers a warning, which ensures that I look at the console and see the big red message.
@@ -118,26 +118,41 @@ module circlePolar(R, theta=0, length=0) {
     }
 }
 
-module rotateAround(A, X=0, Y=0) {
-     translate([X, Y, 0]) {
+module rotateAround(A, X=0, Y=0, Z=0) {
+     translate([X, Y, Z]) {
           rotate(A) {
-               translate([-X, -Y, 0]) {
+               translate([-X, -Y, Z]) {
                     children();
                };
           };
      };
 };
 
-module cylinderAround(R, L, O=[0,0,0], IR=0, A=[0,0,0]) {
+module cylinderAround(R, L, O=[0,0,0], IR=-1, A=[0,0,0], R2=-1, IR2=-1) {
      translate(O) {
           rotate(a=A) {
-               if (IR > 0) {
-                    difference() {
-                         cylinder(h=L, r=R, center=true);
-                         cylinder(h=L*1.1, r=IR, center=true);
+               difference() {
+                    union() {
+                         if (R2 < 0) {
+                              cylinder(h=L, r=R, center=true);
+                         };
+                         if (R2 >= 0) {
+                              cylinder(h=L, r1=R, r2=R2, center=true);
+                         };
                     };
-               } else {
-                    cylinder(h=L, r=R, center=true);
+                    union() {
+                         if (IR >= 0) {
+                              // Extend the inner cylinder a bit so that there aren't the weird boundary effects at the end.
+                              if (IR2 < 0 || IR2) {
+                                   cylinder(h=L*1.1, r=IR, center=true);
+                              };
+                              if (IR2 >= 0) {
+                                   // Because of the sloped interior, need to be a bit smarter than usual about the overextended inner cylinder.
+                                   gap = (IR-IR2);
+                                   cylinder(h=L*1.1, r1=IR + gap*0.05, r2=IR2 - gap*0.05, center=true);
+                              };
+                         };
+                    };
                };
           };
      };

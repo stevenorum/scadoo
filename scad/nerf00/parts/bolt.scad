@@ -26,7 +26,7 @@ module bolt_3d_raw() {
 };
 
 module bolt_3d() {
-     translate(ph_offset) {
+     translate(bh_offset) {
           bolt_3d_raw();
      };
 };

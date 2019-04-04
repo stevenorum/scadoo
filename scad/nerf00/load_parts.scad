@@ -9,6 +9,7 @@ tg_color = ["purple",1.0];
 rc_color = ["black",0.5];
 ce_color = ["lime",0.5];
 ci_color = ["white",0.2];
+mw_color = ["magenta",1.0];
 
 include <parts/sear_disk.scad>;
 include <parts/sear_catch.scad>;
@@ -18,7 +19,11 @@ include <parts/bolt.scad>;
 include <parts/trigger.scad>;
 include <parts/receiver.scad>;
 include <parts/cylinder.scad>;
+include <parts/magwell.scad>;
 
+color(mw_color[0], mw_color[1]) {
+     magwell_3d();
+};
 
 color(sc_color[0], sc_color[1]) {
      sear_catch_3d();
