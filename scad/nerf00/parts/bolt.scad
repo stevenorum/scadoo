@@ -7,7 +7,9 @@ module bolt_3d_raw() {
                cylinderAround(bh_or_cy, L=bh_l_cy, O=bh_o_cy, A=cy_orientation, IR=bh_ir);
                cylinderAround(bh_or_ch, L=bh_l_ch, O=bh_o_ch, A=cy_orientation, IR=bh_ir);
                cylinderAround(bh_or_br, L=bh_l_br, O=bh_o_br, A=cy_orientation, IR=bh_ir_br);
-
+               /* cylinderAround(); */
+               /* cylinderAround(); */
+               
                /* difference() { */
                /*      cylinderAround(bh_or_ch, L=0.5, O=bh_o_ch - [bh_l_ch/2, 0, 0] + [0.25,0,0], A=cy_orientation); */
                /*      deepify(1) { */

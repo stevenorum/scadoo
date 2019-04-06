@@ -10,7 +10,7 @@ module magwell_3d_raw() {
           };
           union() {
                deepify(magwell_hole_width) {
-                    rectangleRelative((magwell_length-magwell_hole_length)/2,-$iota,magwell_hole_length, magwell_height + 2*$iota);
+                    rectangleRelative((magwell_length-(magwell_hole_length+magwell_rear_assembly_length))/2,-$iota,magwell_hole_length, magwell_height + 2*$iota);
                };
           };
      };

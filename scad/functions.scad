@@ -144,13 +144,17 @@ module cylinderAround(R, L, O=[0,0,0], IR=-1, A=[0,0,0], R2=-1, IR2=-1) {
                     union() {
                          if (IR >= 0) {
                               // Extend the inner cylinder a bit so that there aren't the weird boundary effects at the end.
-                              if (IR2 < 0 || IR2) {
+                              if (IR2 < 0 || IR2==IR) {
                                    cylinder(h=L*1.1, r=IR, center=true);
                               };
                               if (IR2 >= 0) {
                                    // Because of the sloped interior, need to be a bit smarter than usual about the overextended inner cylinder.
+                                   echo(L);
+                                   echo(IR);
+                                   echo(IR2);
                                    gap = (IR-IR2);
-                                   cylinder(h=L*1.1, r1=IR + gap*0.05, r2=IR2 - gap*0.05, center=true);
+                                   /* cylinder(h=L, r1=IR, r2=IR2, center=true); */
+                                   cylinder(h=L*1.002, r1=IR + gap*0.001, r2=IR2 - gap*0.001, center=true);
                               };
                          };
                     };
@@ -182,3 +186,9 @@ module mirrorAdd(v) {
 
 function concatenate(L1, L2) = [for (i=[0:len(L1)+len(L2)-1]) 
                         i < len(L1)? L1[i] : L2[i-len(L1)]] ;
+
+module sphereXYZ(R, X=0, Y=0, Z=0) {
+     translate([X,Y,Z]) {
+          sphere(r=R);
+     };
+};

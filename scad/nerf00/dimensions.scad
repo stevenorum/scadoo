@@ -205,6 +205,13 @@ bh_or_br = br_ir - $iota; // OR of the part that goes into the barrel.  I still 
 bh_ir_br = bh_or_br*0.75;
 bh_o_br = bh_o_ch + [-(bh_l_ch+bh_l_br)/2, 0, 0];
 
+bolt_handle_diameter = 0;
+bolt_handle_radius = bolt_handle_diameter/2;
+bolt_handle_length = 1;
+bolt_handle_bend_angle = 60;
+bolt_handle_bend_length = 0.5;
+bolt_handle_ball_radius = 0.35;
+
 bh_offset = [ph_offset[0] + ($charged ? 0.5 : -(bh_l_ch + bh_l_br)+1), 0, 0];
 
 
@@ -257,11 +264,16 @@ tg_aay = tg_offset[1] + tg_ay;
 // receiver dimensions
 // rc_???
 
-magwell_length = 4;
-magwell_width = 2;
-magwell_hole_length = 3;
-magwell_hole_width = 1;
-magwell_height = 2;
+magwell_hole_length = 3.2;
+magwell_hole_width = 1.0;
+magwell_sidewall_thickness = 0.15;
+magwell_width = magwell_hole_width + 2*magwell_sidewall_thickness;
+magwell_rear_assembly_length = 0.5; // Contains the mag-hold catch and the release button, for example.
+magwell_length = magwell_hole_length + magwell_sidewall_thickness + magwell_rear_assembly_length;
+
+// bottom should be 3.3 inches below the line of the bolt
+magwell_height = 3.3 - cy_origin[1];
+/* magwell_height = 2; */
 
 magwell_offset = [cy_translate[0]-cy_length/2-magwell_length,-magwell_height,0];
 

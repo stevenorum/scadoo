@@ -1,23 +1,34 @@
 use <../functions.scad>;
 include <../constants.scad>;
-
+$fn = 360;
 $iota = 0.001;
 $multiplier = 25.4;
 
-ring_length = 0.5;
-ring_max_thickness = 0.075;
-ring_inner_diameter = 1.25;
+ring_length = 1.0;
+ring_max_thickness = 0.1;
+ring_inner_diameter = 1.77;
+ring_trailing_inner_diameter = 1.8;
+ring_leading_inner_diameter = 1.83;
 ring_outer_diameter = ring_inner_diameter + 2* ring_max_thickness;
 ring_inner_radius = ring_inner_diameter / 2;
 ring_outer_radius = ring_outer_diameter / 2;
-ring_leading_edge_thickness = 0.02;
-ring_trailing_edge_thickness = 0.02;
-ring_leading_section_length = 0.15;
-ring_trailing_section_length = 0.3;
+ring_trailing_inner_radius = ring_trailing_inner_diameter / 2;
+ring_leading_inner_radius = ring_leading_inner_diameter / 2;
+
+
+
+ring_leading_edge_thickness = 0.03;
+ring_trailing_edge_thickness = 0.03;
+
+ring_leading_outer_radius = ring_leading_inner_radius + ring_leading_edge_thickness;
+ring_trailing_outer_radius = ring_trailing_inner_radius + ring_trailing_edge_thickness;
+
+ring_leading_section_length = 0.2;
+ring_trailing_section_length = ring_length - ring_leading_section_length - 0.1;
 ring_middle_section_length = ring_length - ring_leading_section_length - ring_trailing_section_length;
-ring_fin_count = 8;
+ring_fin_count = 6;
 ring_fin_angle = 30;
-ring_fin_thickness = 0.05;
+ring_fin_thickness = 0.04;
 
 ring_leading_origin = [0,0,ring_leading_section_length/2];
 ring_middle_origin = [0,0,ring_leading_section_length + ring_middle_section_length/2];
@@ -85,12 +96,12 @@ union() {
 
 /* circularAirfoil(sections); */
 smoothify(ring_leading_section_length,
-          OR1=ring_inner_radius + ring_leading_edge_thickness,
-          IR1=ring_inner_radius,
+          OR1=ring_leading_outer_radius,
+          IR1=ring_leading_inner_radius,
           OR2=ring_outer_radius,
           IR2=ring_inner_radius,
-          steps=5,
-          factor=0.5,
+          steps=3,
+          factor=0.3,
           origin=ring_leading_origin-[0,0,ring_leading_section_length/2]
      );
 /* cylinderAround(R=ring_inner_radius + ring_leading_edge_thickness, */
@@ -105,9 +116,9 @@ cylinderAround(R=ring_outer_radius,
 smoothify(ring_trailing_section_length,
           OR1=ring_outer_radius,
           IR1=ring_inner_radius,
-          OR2=ring_inner_radius + ring_trailing_edge_thickness,
-          IR2=ring_inner_radius,
-          steps=2,
+          OR2=ring_trailing_outer_radius,
+          IR2=ring_trailing_inner_radius,
+          steps=1,
           origin=ring_trailing_origin-[0,0,ring_trailing_section_length/2],
           factor=.6
      );
@@ -129,6 +140,8 @@ if (ring_fin_count > 0) {
                cylinderAround(R=ring_outer_radius,
                               L=ring_trailing_section_length,
                               IR=ring_inner_radius,
+                              
+                              IR2=ring_trailing_inner_radius,
                               O=ring_trailing_origin);
                hull() {
                     translate([0,0,ring_leading_section_length+ring_middle_section_length]) {
