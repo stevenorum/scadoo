@@ -18,3 +18,9 @@ module cylinder_exterior_3d() {
           cylinderAround(cy_or, L=cy_length, O=cy_origin, IR=cy_ir, A=cy_orientation);
      };
 };
+
+module cylinder_test_exterior_3d() {
+     translate(cy_translate) {
+          cylinderAround(cy_or, L=cy_length, O=cy_origin, IR=cy_ir, A=cy_orientation);
+     };
+};

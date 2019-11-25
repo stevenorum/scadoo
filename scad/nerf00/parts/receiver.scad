@@ -19,12 +19,16 @@ module receiver_pin_cutouts() {
           sear_catch_subtract_2d();
      };
      translate(tg_offset) {
-          trigger_2d_subtract();
+          trigger_subtract_2d();
      };
 };
 
 module receiver_footprint() {
-     rectangle(rc_fx, rc_fy, rc_rx, rc_ry);
+     cy = cy_translate[1]+cy_origin[1]-cy_or-rc_offset[1];
+     union() {
+          rectangle(rc_fx, rc_fy, rc_rx, cy-rc_wall);
+          rectangle(rc_fx+1/2, rc_fy, rc_rx-1/2, cy);
+     };
 };
 
 module receiver_plate(thickness=0) {
@@ -40,15 +44,15 @@ module remove_from_sides() {
      union() {
           cylinderExterior();
           translate([-.1,0,0]) {
-               receiver_front_cylinder_holder();
+               //receiver_front_cylinder_holder();
           };
           translate([.1,0,0]) {
-               receiver_rear_cylinder_holder();
+               //receiver_rear_cylinder_holder();
           };
-          cylinderAround(cy_or+$iota, L=rc_rt, O=[rc_rx, cy_origin[1], cy_origin[2]], A=cy_orientation, IR=cy_or);
-          cylinderAround(cy_or+$iota, L=rc_rt, O=[rc_fx, cy_origin[1], cy_origin[2]], A=cy_orientation, IR=cy_or);
-          receiver_front_cylinder_holder();
-          receiver_rear_cylinder_holder();
+          //cylinderAround(cy_or+$iota, L=rc_rt, O=[rc_rx, cy_origin[1], cy_origin[2]], A=cy_orientation, IR=cy_or);
+          //cylinderAround(cy_or+$iota, L=rc_rt, O=[rc_fx, cy_origin[1], cy_origin[2]], A=cy_orientation, IR=cy_or);
+          //receiver_front_cylinder_holder();
+          //receiver_rear_cylinder_holder();
      };
 };
 
@@ -75,25 +79,36 @@ module receiver_axle_pins() {
 };
 
 module receiver_right_side() {
-     difference() {
-          union() {
-               translate(-1*rc_offset) {
-                    receiver_plate();
-               };
-               receiver_spring_blocks();
+     /* difference() { */
+     /*      union() { */
+     /*           translate(-1*rc_offset) { */
+     /*                receiver_plate(); */
+     /*           }; */
+     /*           receiver_spring_blocks(); */
+     /*      }; */
+     /*      remove_from_sides(); */
+     /* }; */
+     union() {
+          translate(-1*rc_offset) {
+               receiver_plate();
           };
-          remove_from_sides();
+          receiver_spring_blocks();
      };
 };
 
 module receiver_left_side() {
-     difference() {
-          union() {
-               translate(rc_offset) {
-                    receiver_plate();
-               };
+     /* difference() { */
+     /*      union() { */
+     /*           translate(rc_offset) { */
+     /*                receiver_plate(); */
+     /*           }; */
+     /*      }; */
+     /*      remove_from_sides(); */
+     /* }; */
+     union() {
+          translate(rc_offset) {
+               receiver_plate();
           };
-          remove_from_sides();
      };
 };
 
